@@ -1,4 +1,4 @@
-package webhook
+package module
 
 import (
 	"encoding/json"
@@ -7,13 +7,12 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/Nivesh00/configmap-admission-webhook.git/global"
 	admissionv1 "k8s.io/api/admission/v1"
 )
 
 func HandleValidation(w http.ResponseWriter, r *http.Request) {
 
-	admissionReview, configmap, err := global.ParseAdmissionRequest(r)
+	admissionReview, configmap, err := ParseAdmissionRequest(r)
 	if err != nil {
 		slog.Error(
 			"An error occured, cannot validate object",
@@ -28,15 +27,17 @@ func HandleValidation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	// Variable to check if operation is allowed
 	allowed := true
+
 	// Warnings to give back to user
 	var warnings []string
+
 	// User settings
-	forbiddenKeys := &global.GlobalForbiddenKeys.KeyList
-	caseSensitive :=  global.GlobalForbiddenKeys.CaseSensitive
-	policy        :=  global.GlobalForbiddenKeys.Policy
+	forbiddenKeys := &GlobalForbiddenKeys.KeyList
+	caseSensitive :=  GlobalForbiddenKeys.CaseSensitive
+	policy        :=  GlobalForbiddenKeys.Policy
+
 	// Check for forbidden keys
 	for key := range(configmap.Data) {
 
@@ -66,7 +67,6 @@ func HandleValidation(w http.ResponseWriter, r *http.Request) {
 
 	var patches []patchOperation
 
-
 	// ##################################
 
 	// Create admission response
@@ -74,6 +74,7 @@ func HandleValidation(w http.ResponseWriter, r *http.Request) {
 		UID: *&admissionReview.Request.UID,
 		Allowed: allowed,
 	}
+
 	// Create admission review response
 	admissionReviewResponse := admissionv1.AdmissionReview{
 		Response: &admissionResponse,

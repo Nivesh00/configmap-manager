@@ -1,4 +1,4 @@
-package global
+package module
 
 import (
 	"encoding/json"
@@ -10,6 +10,9 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
+
+// Function parses an admission request and returns the
+// admission review, the configmap and an error
 func ParseAdmissionRequest(r *http.Request) (*admissionv1.AdmissionReview, *corev1.ConfigMap, error) {
 
 	// Parse request body
