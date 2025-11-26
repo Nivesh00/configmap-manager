@@ -4,28 +4,37 @@ import (
 	"os"
 	"strings"
 	"log/slog"
+    "fmt"
 )
 
 // Global variable for user settings
 var GlobalForbiddenKeys ForbiddenKeys
 
-func AssignForbiddenKeys() {
+func AssignForbiddenKeys() error {
 
 	// Get environmental variable
-    keys          := os.Getenv("FORBIDDEN_KEYS")
-    policy        := os.Getenv("POLICY")
-    caseSensitive := true
-    if os.Getenv("CASE_SENSITIVE") == "disabled" {
-        caseSensitive = false
+    keys := os.Getenv("FORBIDDEN_KEYS")
+    if keys == "" {
+        slog.Info("Cannot find any forbidden keys")
+        return fmt.Errorf("no forbidden keys found, cannot run program")
     }
+    caseSensitive := os.Getenv("CASE_SENSITIVE")
+    policy := os.Getenv("POLICY")
+
     // Assign forbidden keys struct
-    GlobalForbiddenKeys.CreateForbiddenKeyList(keys, policy, caseSensitive)
+    GlobalForbiddenKeys.CreateForbiddenKeyList(policy, caseSensitive, keys)
 
 	slog.Info(
-		"Finished processing forbidden keys.",
-		"Forbidden Keys are: ",
+		"Finished processing user settings",
+		"forbidden keys",
 		strings.Join(GlobalForbiddenKeys.KeyList, " "),
+        "policy",
+        policy,
+        "case sensitive",
+        caseSensitive,
 	)
+
+    return nil
 }
 
 
@@ -39,16 +48,24 @@ type ForbiddenKeys struct {
 
 // Looks for environmental variables and adds them to
 // the key list
-func (f *ForbiddenKeys) CreateForbiddenKeyList(keys string, policy string, caseSensitive bool) {
+func (f *ForbiddenKeys) CreateForbiddenKeyList(policy string, caseSensitive string, keys string) {
 
-    // Assign values
-    f.CaseSensitive = caseSensitive
+    // Set policy
+    f.Policy = "auto"
+    policy = strings.ToLower(policy)
+    if policy == "manual" {
+        f.Policy = "manual"
+    }
+
+    // Set case sensitivity
+    f.CaseSensitive = true
+    if caseSensitive == "disabled" {
+        f.CaseSensitive = false
+    }
 
 	// If case sensitive, store all values as lowercase
-	if !caseSensitive {
+	if !f.CaseSensitive {
 		keys = strings.ToLower(keys)
 	}
-    f.KeyList       = strings.Split(keys, ",")
-
-    f.Policy        = policy
+    f.KeyList = strings.Split(keys, ",")
 }

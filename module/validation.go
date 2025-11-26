@@ -63,16 +63,11 @@ func HandleValidation(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	// ###### FOR MUTATING WEBHOOK ######
-
-	var patches []patchOperation
-
-	// ##################################
-
 	// Create admission response
 	admissionResponse := admissionv1.AdmissionResponse{
-		UID: *&admissionReview.Request.UID,
+		UID: admissionReview.Request.UID,
 		Allowed: allowed,
+		Warnings: warnings,
 	}
 
 	// Create admission review response
