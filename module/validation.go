@@ -76,7 +76,7 @@ func HandleValidation(w http.ResponseWriter, r *http.Request) {
 
 	// If object is rejected
 	if !allowed {
-		msg := "forbidden keys found in configmap for policy " + policy
+		msg := "object is invalid, forbidden keys found in configmap for policy " + policy
 		// Prepend msg to warnings
 		warnings = append(
 			[]string{msg}, 
