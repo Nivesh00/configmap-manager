@@ -10,7 +10,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-
 // Function parses an admission request and returns the
 // admission review, the configmap and an error
 func ParseAdmissionRequest(r *http.Request) (*admissionv1.AdmissionReview, *corev1.ConfigMap, error) {
@@ -34,14 +33,11 @@ func ParseAdmissionRequest(r *http.Request) (*admissionv1.AdmissionReview, *core
 
 	slog.Info(
 		"successfully unmarshalled request body",
-		"name",
-		admissionReview.Request.Name,
-		"namespace",
-		admissionReview.Request.Namespace,
-		"kind",
-		admissionReview.Request.Kind,
-		"operation",
-		admissionReview.Request.Operation,
+		"name", 	 admissionReview.Request.Name,
+		"namespace", admissionReview.Request.Namespace,
+		"group", 	 admissionReview.Request.Kind.Group,
+		"kind", 	 admissionReview.Request.Kind.Kind,
+		"operation", admissionReview.Request.Operation,
 	)
 
 	// Assign admission request object to specific k8s object

@@ -26,17 +26,16 @@ func AssignForbiddenKeys() error {
 
 	slog.Info(
 		"Finished processing user settings",
-		"forbidden keys",
+		"forbidden_keys",
 		"[" + strings.Join(GlobalForbiddenKeys.KeyList, ", ") + "]",
         "policy",
-        policy,
+        GlobalForbiddenKeys.Policy,
         "case sensitive",
-        caseSensitive,
+        GlobalForbiddenKeys.CaseSensitive,
 	)
 
     return nil
 }
-
 
 // Object to store for testing
 type ForbiddenKeys struct {
@@ -45,16 +44,15 @@ type ForbiddenKeys struct {
     CaseSensitive    bool
 }
 
-
 // Looks for environmental variables and adds them to
 // the key list
 func (f *ForbiddenKeys) CreateForbiddenKeyList(policy string, caseSensitive string, keys string) {
 
     // Set policy
-    f.Policy = "auto"
+    f.Policy = "manual"
     policy = strings.ToLower(policy)
-    if policy == "manual" {
-        f.Policy = "manual"
+    if policy == "auto" {
+        f.Policy = "auto"
     }
 
     // Set case sensitivity
@@ -67,5 +65,5 @@ func (f *ForbiddenKeys) CreateForbiddenKeyList(policy string, caseSensitive stri
 	if !f.CaseSensitive {
 		keys = strings.ToLower(keys)
 	}
-    f.KeyList = strings.Split(keys, ",")
+    f.KeyList = strings.Split(keys, ", ")
 }
