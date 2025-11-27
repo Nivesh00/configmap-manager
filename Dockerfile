@@ -1,30 +1,31 @@
-# syntax=docker/dockerfile:1
-FROM golang:1.24.5
+# Build application
+FROM golang:1.24.5 AS build
 
-# Set destination for COPY
 WORKDIR /app
 
-# Download Go modules
+# Copy go files
 COPY src/go.mod src/go.sum ./
 RUN go mod download
 
-# Copy the source code. Note the slash at the end, as explained in
-# https://docs.docker.com/engine/reference/builder/#copy
+# Copy modules
 COPY src/module/helper.go ./module/
 COPY src/module/global.go ./module/
 COPY src/module/mutation.go ./module/
 COPY src/module/validation.go ./module/
+
+# Copy main file
 COPY src/main.go ./
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/configmap-admission-webhook
+RUN CGO_ENABLED=0 GOOS=linux go build -o /build/admission-webhook
 
-# Optional:
-# To bind to a TCP port, runtime parameters must be supplied to the docker command.
-# But we can document in the Dockerfile what ports
-# the application is going to listen on by default.
-# https://docs.docker.com/engine/reference/builder/#expose
+# Now copy it into our base image
+# Smaller, distroless
+FROM gcr.io/distroless/static-debian12
+COPY --from=build /build/admission-webhook /app
+
+# Expose https port
 EXPOSE 443
 
 # Run
-CMD ["/bin/configmap-admission-webhook"]
+CMD ["/app/admission-webhook"]
