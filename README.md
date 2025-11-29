@@ -40,7 +40,7 @@ data:
 
 The docker image can be found in this repository and can be pulled using following command:
 ```dh
-docker pull ghcr.io/nivesh00/configmap-admission-webhook:latest
+docker pull ghcr.io/nivesh00/configmap-manager:latest
 ```
 
 ## SSL
