@@ -12,7 +12,6 @@ on:
     # Only run on `main`
     branches:
       - main
-      - develop
 
 jobs:
   docker_image:
