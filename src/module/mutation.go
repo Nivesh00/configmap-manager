@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"net/http"
 	"slices"
-	"strconv"
 	"strings"
 
 	admissionv1 "k8s.io/api/admission/v1"
@@ -49,9 +48,6 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 	// Allow
 	allowed := true
 
-	// Warnings to give back to user
-	var forbiddenKeysFound []string
-
 	// Patches operations to do
 	var patches []PatchOperation
 
@@ -80,8 +76,6 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 					"kind",  	 objKind,
 					"key", 		 key,
 				)
-				// Append warning
-				forbiddenKeysFound = append(forbiddenKeysFound, key)
 				// Remove path
 				patchOperation := PatchOperation{
 					Operation: "remove",
@@ -113,17 +107,6 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 
 	patchType := admissionv1.PatchTypeJSONPatch
 
-	// Result for user
-	var result metav1.Status
-
-	if !allowed {
-		result.Status  = "Failure"
-		result.Code    = 406
-		result.Message = "using policy '" + policy + "' " +
-			"and case sensitive '" + strconv.FormatBool(caseSensitive) + "', " +
-			"following forbidden keys were removed: [" + strings.Join(forbiddenKeysFound, ", ") + "]"
-	}
-
 	// Create admission response
 	admissionResponse := admissionv1.AdmissionResponse{
 		UID: 		 	  admissionRequest.UID,
@@ -131,7 +114,16 @@ func HandleMutation(w http.ResponseWriter, r *http.Request) {
 		AuditAnnotations: auditAnnotations,
 		Patch: 			  patchesBytes,
 		PatchType: 	 	  &patchType,
-		Result: 		  &result,
+	}
+
+	// Result for user
+	if !allowed {
+		result := &metav1.Status{
+			Status: "Failure",
+			Message: "error=" + err.Error(),
+			Code: 406,
+		}
+		admissionResponse.Result = result
 	}
 
 	// User warnings
