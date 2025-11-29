@@ -1,6 +1,6 @@
 #  Configmap Manager
 
-Webhook is used to check keys in a configmap and can either reject the configmap or edit it to remove the forbidden keys.
+Configmap Manager is a Kubernetes webhook for resources of type `ConfigMap` and is used to check keys in a configmap. It can then either reject the configmap or edit it to remove the forbidden keys.
 
 Since configmaps are stored on disk, it is not recommended to store sensitive data like api keys, passwords etc. in them. These kind of data are better store in a secret, which are stored in memory.
 
