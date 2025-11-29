@@ -40,7 +40,7 @@ jobs:
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.ACCESS_TOKEN }}
 
       - name: Build and Push the Docker Image
         uses: docker/build-push-action@v6
@@ -50,4 +50,4 @@ jobs:
           push: true
           tags: ${{ env.DOCKER_REGISTRY_URL }}/${{ env.DOCKER_REPOSITORY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
           secrets: |
-            GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            GIT_AUTH_TOKEN=${{ secrets.ACCESS_TOKEN }}
