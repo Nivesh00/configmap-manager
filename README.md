@@ -66,4 +66,8 @@ https://cert-manager.io/docs/concepts/ca-injector/#injecting-ca-data-from-a-cert
 
 Manifests files can be found in the `kustomize` directory. The manifest files are not yet created but test manifest files can be found in same directory.
 
-By using the `kind` overlay, the resources are created in the namespace `configmap-manager`.
+By using the `kind` overlay, the resources are created in the namespace `configmap-manager`. To use that overlay, use the following command:
+```sh
+kustomize build kustomize/overlays/kind | kubectl apply -f -
+```
+Alternatively, the `kind` overlay can be used as a template for other overlays
