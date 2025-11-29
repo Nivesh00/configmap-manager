@@ -91,14 +91,15 @@ func (f *ForbiddenKeys) CreateForbiddenKeyList(policy string, caseSensitive stri
     // Set case sensitivity
     f.CaseSensitive = true
     caseSensitive = strings.ToUpper(caseSensitive)
-    if caseSensitive == "DISABLED" || caseSensitive == "FALSE" {
+    if caseSensitive == "FALSE" {
         f.CaseSensitive = false
     }
 
 	// If case sensitive, store all values as lowercase
+    keys = strings.ReplaceAll(keys, " ", "")
 	if !f.CaseSensitive {
 		keys = strings.ToLower(keys)
 	}
-    f.KeyList = strings.Split(keys, ", ")
+    f.KeyList = strings.Split(keys, ",")
 }
 
