@@ -6,18 +6,28 @@ env:
   DOCKER_REGISTRY_URL: ghcr.io
   DOCKER_REPOSITORY: nivesh00
   DOCKER_IMAGE_NAME: configmap-manager
-  DOCKER_IMAGE_TAG: "0.1.0"
+  DOCKER_IMAGE_TAG: "debug"
 
 on:
   push:
     # Only run on `main`
     branches:
       - main
+      - develop
 
 jobs:
   docker_image:
     runs-on: ubuntu-latest
     steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # Do not get extra git branches to save time
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       # Buil and push to 
       - name: Build and Push the Docker Image
         uses: docker/build-push-action@v6
